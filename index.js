@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config()
 const port = process.env.PORT || 3000;
 const cors = require('cors');
@@ -8,12 +8,7 @@ const cors = require('cors');
 app.use(cors());
 app.use(express.json());
 
-console.log(process.env.DB_USER)
-console.log(process.env.DB_PASS)
-
-// const uri = "mongodb+srv://ahananondi6:TqEAzyr6EG6N0s3W@cluster0.epxwefd.mongodb.net/?retryWrites=true&w=majority";
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.epxwefd.mongodb.net/?retryWrites=true&w=majority`;
-console.log(uri)
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
@@ -39,11 +34,19 @@ async function run() {
       res.send(result);
     })
 
-    app.post('/user', async (req, res) => {
+    app.post('/users', async (req, res) => {
         const user = req.body;
         console.log('new user', user);
         const result = await usersCollection.insertOne(user);
         res.send(result);
+    })
+
+    app.delete('/users/:id', async(req, res) => {
+      const id = req.params.id;
+      console.log(id);
+      const query = {_id :new ObjectId(id)};
+      const result = await usersCollection.deleteOne(query);
+      res.send(result);
     })
 
 
